@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
+import { useSelector, useDispatch } from 'react-redux';
 
 import './App.css';
 
@@ -15,42 +14,30 @@ import CheckoutPage from './pages/checkoutPage/checkoutPage-comp';
 
 import Header from './components/header/header-comp';
 
-class App extends React.Component {
-	componentDidMount() {
-		const { checkUserSession } = this.props;
-		checkUserSession();
-	}
+const App = () => {
+	const currentUser = useSelector(selectCurrentUser);
+	const dispatch = useDispatch();
 
-	// componentWillUnmount() {
-	// }
+	// using useEffect as ComponentDidMount
+	useEffect(
+		() => {
+			dispatch(checkUserSession());
+		},
+		[ dispatch ]
+	);
 
-	render() {
-		return (
-			<div>
-				<Header />
-				{/* Switch works like switch case */}
-				<Switch>
-					<Route exact path="/" component={HomePage} />
-					<Route path="/shop" component={ShopPage} />
-					<Route exact path="/checkout" component={CheckoutPage} />
-					<Route
-						exact
-						path="/sign"
-						render={() => (this.props.currentUser ? <Redirect to="/" /> : <AuthPage />)}
-					/>
-				</Switch>
-			</div>
-		);
-	}
-}
+	return (
+		<div>
+			<Header />
+			{/* Switch works like switch case */}
+			<Switch>
+				<Route exact path="/" component={HomePage} />
+				<Route path="/shop" component={ShopPage} />
+				<Route exact path="/checkout" component={CheckoutPage} />
+				<Route exact path="/sign" render={() => (currentUser ? <Redirect to="/" /> : <AuthPage />)} />
+			</Switch>
+		</div>
+	);
+};
 
-// createStructuredSelector automatically passes state to the the selector functions
-const mapStateToProps = createStructuredSelector({
-	currentUser: selectCurrentUser
-});
-
-const mapDispatchToProps = dispatch => ({
-	checkUserSession: () => dispatch(checkUserSession())
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

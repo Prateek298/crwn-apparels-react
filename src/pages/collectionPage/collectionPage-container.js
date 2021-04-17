@@ -1,15 +1,13 @@
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useSelector } from 'react-redux';
 
 import { selectIsCollectionLoaded } from '../../redux/shop/shop-selectors';
 
 import CollectionPage from './collectionPage-comp';
-import WithSpinner from '../../components/withSpinner/withSpinner-comp';
+import LoadingSpinner from '../../components/loadingSpinner/loadingSpinner-comp';
 
-const mapStateToProps = state => ({
-	isLoading: !selectIsCollectionLoaded(state)
-});
-
-const CollectionPageContainer = compose(connect(mapStateToProps), WithSpinner)(CollectionPage);
+const CollectionPageContainer = ({ match }) => {
+	const isLoading = !useSelector(selectIsCollectionLoaded);
+	return isLoading ? <LoadingSpinner /> : <CollectionPage match={match} />;
+};
 
 export default CollectionPageContainer;
