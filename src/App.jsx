@@ -12,9 +12,9 @@ import { selectCurrentUser } from './redux/user/user-selectors';
 import HomePage from './pages/homepage/homepage-comp';
 import ShopPage from './pages/shop/shop-comp';
 import AuthPage from './pages/authPage/authPage-comp';
-import CheckoutPage from './pages/checkoutPage/checkoutPage-comp';
+import { default as CheckoutPage } from './pages/checkoutPage/checkoutPage-container';
 
-import Header from './components/header/header-comp';
+import { default as Header } from './components/header/header-container';
 
 class App extends React.Component {
 	unsubscribeFromAuth = null;
