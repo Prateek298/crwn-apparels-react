@@ -4,9 +4,11 @@ import { auth, googleProvider, createUserProfileDocument, getCurrentUser } from 
 
 import UserActionTypes from './user-action-types';
 import { signInSuccess, signInFailure, signOutSuccess, signOutFailure } from './user-actions';
+import { clearCart } from '../cart/cart-actions';
 
 // When new user signs up with email
 
+// 2nd argument receives the action from respective reducer
 function* onEmailSignUpStart() {
 	yield takeLatest(UserActionTypes.EMAIL_SIGN_UP_START, createNewUser);
 }
@@ -61,6 +63,7 @@ function* isUserAuthenticated() {
 	try {
 		const userAuth = yield getCurrentUser();
 		if (!userAuth) return;
+		yield put(clearCart());
 		yield getSnapshotFromUserAuth(userAuth);
 	} catch (err) {
 		yield put(signInFailure(err));
@@ -104,3 +107,12 @@ export function* userSagas() {
 		call(onSignOutStart)
 	]);
 }
+
+// export function* waitFor(selector) {
+// 	if (yield select(selector)) return;
+
+// 	while (true) {
+// 		yield take('*');
+// 		if (yield select(selector)) return;
+// 	}
+// }
