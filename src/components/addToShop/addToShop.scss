@@ -1,0 +1,15 @@
+.addToShop {
+	display: flex;
+	flex-direction: column;
+	width: 380px;
+
+	.title {
+		margin: 10px 0;
+	}
+
+	.category-options {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 30px;
+	}
+}

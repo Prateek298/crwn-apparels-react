@@ -24,6 +24,13 @@ const Header = () => {
 				<Logo className="logo" />
 			</Link>
 			<div className="options">
+				{currentUser?.id === process.env.REACT_APP_ADMIN_UID ? (
+					<Link className="option" to="/admin">
+						ADMIN
+					</Link>
+				) : 
+					console.log()
+				}
 				<Link className="option" to="/shop">
 					SHOP
 				</Link>
