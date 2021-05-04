@@ -12,6 +12,8 @@ import { ReactComponent as Logo } from '../../assets/crown.svg';
 import CartIcon from '../cartIcon/cartIcon-comp';
 import CartDropDown from '../cartDropDown/cartDropDown-comp';
 
+require('dotenv').config();
+
 const Header = () => {
 	const currentUser = useSelector(selectCurrentUser);
 	const hidden = useSelector(selectCartHidden);

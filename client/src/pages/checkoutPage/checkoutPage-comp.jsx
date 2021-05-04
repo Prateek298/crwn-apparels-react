@@ -37,7 +37,7 @@ const CheckoutPage = () => {
 			<div className="warning-msg">
 				** Use this info for test payments **
 				<br />
-				Card no. : 4000 0035 6000 0008
+				Card no. : 4242 4242 4242 4242
 				<br />
 				Exp. date: Any future date - CVC: any 3 digits
 			</div>

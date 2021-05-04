@@ -17,6 +17,8 @@ const AuthPage = lazy(() => import('./pages/authPage/authPage-comp'));
 const CheckoutPage = lazy(() => import('./pages/checkoutPage/checkoutPage-comp'));
 const AdminPage = lazy(() => import('./pages/adminPage/adminPage-comp'));
 
+require('dotenv').config();
+
 const App = () => {
 	const currentUser = useSelector(selectCurrentUser);
 	const dispatch = useDispatch();

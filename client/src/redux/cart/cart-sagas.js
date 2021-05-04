@@ -88,6 +88,29 @@ function* clearItemFromFirebaseCart({ payload: item }) {
 	yield call(modifyFirebaseCart, item, clearItemFromCart);
 }
 
+// After a successful payment clears both redux as well as firestore cart of the logged-in user
+
+function* onPaymentSuccess() {
+	yield takeLatest(CartActionTypes.CLEAR_FIRESTORE_CART, clearBothCarts);
+}
+
+function* clearBothCarts() {
+	try {
+		const currentUser = yield select(selectCurrentUser);
+
+		yield call(clearUserCart);
+
+		const userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
+		const userCart = userCartSnap.docs[0];
+		yield firestore.doc(`carts/${userCart.id}`).set({
+			...userCart.data(),
+			cartItems: []
+		});
+	} catch (err) {
+		console.log('Error while clearing user firestore cart ', err);
+	}
+}
+
 function* modifyFirebaseCart(item, modFunc) {
 	try {
 		// only adding item to firestore if a user is logged in
@@ -115,6 +138,7 @@ export function* cartSagas() {
 		call(fetchUserCartStart),
 		call(onAddItem),
 		call(onRemoveItem),
-		call(onClearItem)
+		call(onClearItem),
+		call(onPaymentSuccess)
 	]);
 }
