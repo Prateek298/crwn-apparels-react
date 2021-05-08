@@ -1,9 +1,8 @@
 import React from 'react';
 import StripeCheckout from 'react-stripe-checkout';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
 
-import CartActionTypes from '../../redux/cart/cart-actions-types';
+import { paymentStart } from '../../redux/user/user-actions';
 
 require('dotenv').config();
 
@@ -11,21 +10,7 @@ const StripeCheckoutButton = ({ price }) => {
 	const dispatch = useDispatch();
 	const priceForStripe = price * 1000;
 
-	const onToken = token => {
-		axios({
-			url: 'payment',
-			method: 'post',
-			data: {
-				amount: priceForStripe,
-				token
-			}
-		})
-			.then(res => {
-				dispatch({ type: CartActionTypes.CLEAR_FIRESTORE_CART });
-				alert('Payment successful');
-			})
-			.catch(err => console.log('Payment error: ', err));
-	};
+	const onToken = token => dispatch(paymentStart({ token, priceForStripe }));
 
 	return (
 		<StripeCheckout

@@ -10,8 +10,23 @@ const UsersList = () => {
 	useEffect(() => {
 		async function getAllUsers() {
 			try {
+				const reqList = [];
 				const usersCollectionRef = await firestore.collection('users').get();
-				setUsers(usersCollectionRef.docs.map(user => user));
+
+				for (const user of usersCollectionRef.docs) {
+					const { displayName, email } = user.data();
+
+					const userCartSnap = await firestore.collection('carts').where('userId', '==', user.id).get();
+					const { totalPurchase } = userCartSnap.docs[0].data();
+
+					reqList.push({
+						userId: user.id,
+						displayName,
+						email,
+						totalPurchase
+					});
+				}
+				setUsers(reqList);
 			} catch (err) {
 				console.log(err.message);
 			}
@@ -27,15 +42,17 @@ const UsersList = () => {
 					<tr>
 						<th>Name</th>
 						<th>Email</th>
+						<th>Total spent</th>
 					</tr>
 				</thead>
 				<tbody>
 					{users.map(user => {
-						const { displayName, email } = user.data();
+						const { userId, displayName, email, totalPurchase } = user;
 						return (
-							<tr key={user.id}>
+							<tr key={userId}>
 								<td>{displayName}</td>
 								<td>{email}</td>
+								<td>{totalPurchase}</td>
 							</tr>
 						);
 					})}

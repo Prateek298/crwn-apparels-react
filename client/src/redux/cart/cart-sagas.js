@@ -4,7 +4,7 @@ import { firestore, addCollectionAndDocuments } from '../../firebaseConfig';
 import { clearCart, fetchUserCartFailure, fetchUserCartSuccess } from './cart-actions';
 import { addItemToCart, removeItemFromCart, clearItemFromCart } from './cart-utils';
 import { selectCurrentUser } from '../user/user-selectors';
-import { selectCartItems } from './cart-selectors';
+import { selectCartItems, selectCartTotal } from './cart-selectors';
 
 import UserActionTypes from '../user/user-action-types';
 import CartActionTypes from './cart-actions-types';
@@ -36,7 +36,9 @@ function* fetchUserCartAsync() {
 
 		// create cart for a new user
 		if (userCartSnap.empty) {
-			yield call(addCollectionAndDocuments, 'carts', [ { cartItems: [], userId: currentUser.id } ]);
+			yield call(addCollectionAndDocuments, 'carts', [
+				{ cartItems: [], totalPurchase: 0, userId: currentUser.id }
+			]);
 			optionalGetCartRuns++;
 		}
 
@@ -88,22 +90,28 @@ function* clearItemFromFirebaseCart({ payload: item }) {
 	yield call(modifyFirebaseCart, item, clearItemFromCart);
 }
 
-// After a successful payment clears both redux as well as firestore cart of the logged-in user
+// After a successful payment made by the logged-in user
 
 function* onPaymentSuccess() {
-	yield takeLatest(CartActionTypes.CLEAR_FIRESTORE_CART, clearBothCarts);
+	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, updateBothCarts);
 }
 
-function* clearBothCarts() {
+function* updateBothCarts() {
 	try {
 		const currentUser = yield select(selectCurrentUser);
+		const total = yield select(selectCartTotal);
 
+		//clearing redux cart
 		yield call(clearUserCart);
 
 		const userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
 		const userCart = userCartSnap.docs[0];
+		const totalPurchase = userCart.data().totalPurchase + total;
+
+		// clearing cartItems in firestore and updating total amount spent by the user
 		yield firestore.doc(`carts/${userCart.id}`).set({
 			...userCart.data(),
+			totalPurchase,
 			cartItems: []
 		});
 	} catch (err) {

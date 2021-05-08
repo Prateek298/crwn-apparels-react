@@ -3,8 +3,17 @@ import { takeLatest, call, put, all } from 'redux-saga/effects';
 import { auth, googleProvider, createUserProfileDocument, getCurrentUser } from '../../firebaseConfig';
 
 import UserActionTypes from './user-action-types';
-import { signInSuccess, signInFailure, signOutSuccess, signOutFailure } from './user-actions';
+import {
+	signInSuccess,
+	signInFailure,
+	signOutSuccess,
+	signOutFailure,
+	paymentFailure,
+	paymentSuccess
+} from './user-actions';
 import { clearCart } from '../cart/cart-actions';
+
+import axios from 'axios';
 
 // When new user signs up with email
 
@@ -98,13 +107,38 @@ function* getSnapshotFromUserAuth(userAuth) {
 	}
 }
 
+// When user makes a payment
+
+function* onPaymentStart() {
+	yield takeLatest(UserActionTypes.PAYMENT_START, sendPaymentRequest);
+}
+
+function* sendPaymentRequest({ payload: { token, priceForStripe } }) {
+	try {
+		yield axios({
+			url: 'payment',
+			method: 'post',
+			data: {
+				amount: priceForStripe,
+				token
+			}
+		});
+		yield put(paymentSuccess());
+		alert('Payment Successful');
+	} catch (err) {
+		console.log('Payment error: ', err);
+		yield put(paymentFailure(err));
+	}
+}
+
 export function* userSagas() {
 	yield all([
 		call(onEmailSignUpStart),
 		call(onGoogleSignInStart),
 		call(onEmailSignInStart),
 		call(onCheckUserSession),
-		call(onSignOutStart)
+		call(onSignOutStart),
+		call(onPaymentStart)
 	]);
 }
 

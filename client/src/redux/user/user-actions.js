@@ -40,3 +40,17 @@ export const signOutFailure = error => ({
 	type: UserActionTypes.SIGN_OUT_FAILURE,
 	payload: error
 });
+
+export const paymentStart = paymentInfo => ({
+	type: UserActionTypes.PAYMENT_START,
+	payload: paymentInfo
+});
+
+export const paymentSuccess = () => ({
+	type: UserActionTypes.PAYMENT_SUCCESS
+});
+
+export const paymentFailure = error => ({
+	type: UserActionTypes.PAYMENT_FAILURE,
+	payload: error
+});
