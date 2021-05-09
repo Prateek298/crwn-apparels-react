@@ -2,6 +2,7 @@
 
 body {
 	font-family: 'Open Sans Condensed';
+	padding: 20px 30px;
 }
 
 a {
@@ -11,4 +12,11 @@ a {
 
 * {
 	box-sizing: border-box;
+}
+
+@media screen and (max-width: 800px) {
+	body {
+		padding: 10px;
+		overflow-x: hidden;
+	}
 }

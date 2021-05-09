@@ -6,6 +6,24 @@
 	align-items: center;
 	position: relative;
 
+	@media screen and (max-width: 800px) {
+		width: 100%;
+
+		&.previewWidth {
+			width: 40vw;
+		}
+
+		&:hover {
+			.image {
+				opacity: unset;
+			}
+
+			.custom-button {
+				opacity: unset;
+			}
+		}
+	}
+
 	.image {
 		width: 100%;
 		height: 95%;
@@ -36,6 +54,13 @@
 		top: 255px;
 		width: 80%;
 		display: none;
+
+		@media screen and (max-width: 800px) {
+			display: block;
+			min-width: unset;
+			opacity: 0.9;
+			padding: 0 10px;
+		}
 	}
 
 	&:hover {

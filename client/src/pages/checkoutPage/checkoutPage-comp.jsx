@@ -4,11 +4,13 @@ import { useSelector } from 'react-redux';
 import './checkoutPage.scss';
 
 import { selectCartItems, selectCartTotal } from '../../redux/cart/cart-selectors';
+import { selectCurrentUser } from '../../redux/user/user-selectors';
 
 import CheckoutItem from '../../components/checkoutItem/checkoutItem-comp';
 import StripeCheckoutButton from '../../components/stripeButton/stripeButton-comp';
 
 const CheckoutPage = () => {
+	const currentUser = useSelector(selectCurrentUser);
 	const cartItems = useSelector(selectCartItems);
 	const total = useSelector(selectCartTotal);
 	return (
@@ -41,7 +43,7 @@ const CheckoutPage = () => {
 				<br />
 				Exp. date: Any future date - CVC: any 3 digits
 			</div>
-			<StripeCheckoutButton price={total} />
+			{currentUser ? <StripeCheckoutButton price={total} /> : <p className="login-msg">Log in to buy</p>}
 		</div>
 	);
 };

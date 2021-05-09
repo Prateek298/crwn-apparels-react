@@ -7,6 +7,10 @@
 	font-size: 20px;
 	align-items: center;
 
+	@media screen and (max-width: 800px) {
+		min-height: 120px;
+	}
+
 	.image-container {
 		width: 23%;
 		padding-right: 15px;
@@ -15,24 +19,48 @@
 			width: 100%;
 			height: 100%;
 		}
+
+		@media screen and (max-width: 800px) {
+			width: 24%;
+		}
 	}
-	.name,
-	.quantity,
-	.price {
+
+	.name {
 		width: 23%;
+
+		@media screen and (max-width: 800px) {
+			width: 21%;
+		}
 	}
 
 	.quantity {
 		display: flex;
+		width: 23%;
 
 		.arrow {
 			padding: 0 5px;
 			cursor: pointer;
+		}
+
+		@media screen and (max-width: 800px) {
+			width: 24%;
+		}
+	}
+
+	.price {
+		width: 23%;
+
+		@media screen and (max-width: 800px) {
+			width: 21%;
 		}
 	}
 
 	.remove-button {
 		padding-left: 12px;
 		cursor: pointer;
+
+		@media screen and (max-width: 800px) {
+			padding-left: 0;
+		}
 	}
 }
