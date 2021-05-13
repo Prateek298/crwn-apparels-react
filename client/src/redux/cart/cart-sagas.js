@@ -1,7 +1,14 @@
 import { takeLatest, call, put, all, select } from 'redux-saga/effects';
 
 import { firestore, addCollectionAndDocuments } from '../../firebaseConfig';
-import { clearCart, fetchUserCartFailure, fetchUserCartSuccess } from './cart-actions';
+import {
+	reduxClearCart,
+	fetchUserCartFailure,
+	fetchUserCartSuccess,
+	reduxCartAddItem,
+	reduxCartRemoveItem,
+	reduxCartClearItem
+} from './cart-actions';
 import { addItemToCart, removeItemFromCart, clearItemFromCart } from './cart-utils';
 import { selectCurrentUser } from '../user/user-selectors';
 import { selectCartItems, selectCartTotal } from './cart-selectors';
@@ -12,11 +19,11 @@ import CartActionTypes from './cart-actions-types';
 // clears frontend user cart when user signs out
 
 function* onSignOutSuccess() {
-	yield takeLatest(UserActionTypes.SIGN_OUT_SUCCESS, clearUserCart);
+	yield takeLatest(UserActionTypes.SIGN_OUT_SUCCESS, clearReduxCart);
 }
 
-function* clearUserCart() {
-	yield put(clearCart());
+function* clearReduxCart() {
+	yield put(reduxClearCart());
 }
 
 // fetch user's cart from firestore on login
@@ -63,46 +70,61 @@ function* fetchUserCartAsync() {
 // adds an item to user's personal cart in firestore
 
 function* onAddItem() {
-	yield takeLatest(CartActionTypes.ADD_ITEM, addItemToFirebaseCart);
+	yield takeLatest(CartActionTypes.ADD_ITEM, addItemToBothCarts);
 }
 
-function* addItemToFirebaseCart({ payload: item }) {
-	yield call(modifyFirebaseCart, item, addItemToCart);
+function* addItemToBothCarts({ payload: item }) {
+	try {
+		const error = yield call(alterCarts, item, addItemToCart, reduxCartAddItem);
+		if (error) console.error('Error while adding item to carts ', error.message);
+	} catch (err) {
+		console.error(err.message);
+	}
 }
 
 // decreases quantity of an item from user's personal cart in firestore
 
 function* onRemoveItem() {
-	yield takeLatest(CartActionTypes.REMOVE_ITEM, removeItemFromFirebaseCart);
+	yield takeLatest(CartActionTypes.REMOVE_ITEM, removeItemFromBothCarts);
 }
 
-function* removeItemFromFirebaseCart({ payload: item }) {
-	yield call(modifyFirebaseCart, item, removeItemFromCart);
+function* removeItemFromBothCarts({ payload: item }) {
+	try {
+		const error = yield call(alterCarts, item, removeItemFromCart, reduxCartRemoveItem);
+		if (error) console.error('Error while removing from cart', error.message);
+	} catch (err) {
+		console.error(err.message);
+	}
 }
 
 // clears the whole item from user's personal cart in firestore
 
 function* onClearItem() {
-	yield takeLatest(CartActionTypes.CLEAR_ITEM, clearItemFromFirebaseCart);
+	yield takeLatest(CartActionTypes.CLEAR_ITEM, clearItemFromBothCarts);
 }
 
-function* clearItemFromFirebaseCart({ payload: item }) {
-	yield call(modifyFirebaseCart, item, clearItemFromCart);
+function* clearItemFromBothCarts({ payload: item }) {
+	try {
+		const error = yield call(alterCarts, item, clearItemFromCart, reduxCartClearItem);
+		if (error) console.error('Error while clearing an item from cart', error.message);
+	} catch (err) {
+		console.error(err.message);
+	}
 }
 
 // After a successful payment made by the logged-in user
 
 function* onPaymentSuccess() {
-	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, updateBothCarts);
+	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, modifyCartsAfterPayment);
 }
 
-function* updateBothCarts() {
+function* modifyCartsAfterPayment() {
 	try {
 		const currentUser = yield select(selectCurrentUser);
 		const total = yield select(selectCartTotal);
 
 		//clearing redux cart
-		yield call(clearUserCart);
+		yield call(clearReduxCart);
 
 		const userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
 		const userCart = userCartSnap.docs[0];
@@ -115,7 +137,22 @@ function* updateBothCarts() {
 			cartItems: []
 		});
 	} catch (err) {
-		console.log('Error while clearing user firestore cart ', err);
+		console.error('Error while clearing user cart(s) ', err.message);
+	}
+}
+
+// Multi-use functions
+
+function* alterCarts(item, modFunc, reduxModFunc) {
+	try {
+		const currentUser = yield select(selectCurrentUser);
+
+		if (currentUser) {
+			yield call(modifyFirebaseCart, item, modFunc);
+		}
+		yield put(reduxModFunc(item));
+	} catch (err) {
+		return err;
 	}
 }
 
@@ -132,7 +169,7 @@ function* modifyFirebaseCart(item, modFunc) {
 			cartItems: modFunc(userCart.data().cartItems, item)
 		});
 	} catch (err) {
-		console.log('Problem in modifying firestore cart', err);
+		console.error('Problem in modifying firestore cart', err.message);
 	}
 }
 

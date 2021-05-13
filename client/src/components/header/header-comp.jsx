@@ -26,7 +26,8 @@ const Header = () => {
 				<Logo className="logo" />
 			</Link>
 			<div className="options">
-				{currentUser?.id === process.env.REACT_APP_ADMIN_UID ? (
+				{/* The isAdmin property is added directly to the user's firestore doc through console or code. Firebase does provide an admin SDK, but for the sake of simplicity and extra overhead for a simple feature, I avoided it. */}
+				{currentUser?.isAdmin ? (
 					<Link className="option" to="/admin">
 						ADMIN
 					</Link>

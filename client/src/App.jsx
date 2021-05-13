@@ -42,11 +42,12 @@ const App = () => {
 						<Route path="/shop" component={ShopPage} />
 						<Route exact path="/checkout" component={CheckoutPage} />
 						<Route exact path="/sign" render={() => (currentUser ? <Redirect to="/" /> : <AuthPage />)} />
+						{/* The isAdmin property is added directly to the user's firestore doc through console or code. Firebase does provide an admin SDK, but for the sake of simplicity and extra overhead for a simple feature, I avoided it. */}
 						<Route
 							exact
 							path="/admin"
 							render={() =>
-								currentUser?.id === process.env.REACT_APP_ADMIN_UID ? <AdminPage /> : <Redirect to="/" />}
+								currentUser?.isAdmin ? <AdminPage /> : <Redirect to="/" />}
 						/>
 					</Suspense>
 				</ErrorBoundary>

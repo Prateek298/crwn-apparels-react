@@ -11,7 +11,7 @@ import {
 	paymentFailure,
 	paymentSuccess
 } from './user-actions';
-import { clearCart } from '../cart/cart-actions';
+import { reduxClearCart } from '../cart/cart-actions';
 
 import axios from 'axios';
 
@@ -72,7 +72,7 @@ function* isUserAuthenticated() {
 	try {
 		const userAuth = yield getCurrentUser();
 		if (!userAuth) return;
-		yield put(clearCart());
+		yield put(reduxClearCart());
 		yield getSnapshotFromUserAuth(userAuth);
 	} catch (err) {
 		yield put(signInFailure(err));
