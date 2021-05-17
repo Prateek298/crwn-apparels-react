@@ -20,7 +20,7 @@ export const signInSuccess = user => ({
 });
 
 export const signInFailure = error => ({
-	type: UserActionTypes.SIGN_IN_SUCCESS,
+	type: UserActionTypes.SIGN_IN_FAILURE,
 	payload: error
 });
 
