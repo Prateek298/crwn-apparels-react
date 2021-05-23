@@ -34,7 +34,7 @@ const CheckoutPage = () => {
 			</div>
 			{cartItems.map(cartItem => <CheckoutItem key={cartItem.id} cartItem={cartItem} />)}
 			<div className="total">
-				<span>Total: ${total}</span>
+				<span>Total: &#8377;{total}</span>
 			</div>
 			<div className="warning-msg">
 				** Use this info for test payments **
