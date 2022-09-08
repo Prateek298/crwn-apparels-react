@@ -4,6 +4,8 @@ import { addItemToCart, removeItemFromCart, clearItemFromCart } from './cart-uti
 const INITIAL_STATE = {
 	hidden: true,
 	cartItems: [],
+	pastOrders: [],
+	totalPurchase: null,
 	error: null
 };
 
@@ -35,10 +37,13 @@ const cartReducer = (state = INITIAL_STATE, action) => {
 				cartItems: []
 			};
 		case CartActionTypes.FETCH_USER_CART_SUCCESS:
+			const { cartItems, pastOrders, totalPurchase } = action.payload;
 			return {
 				...state,
 				error: null,
-				cartItems: action.payload
+				cartItems,
+				pastOrders,
+				totalPurchase
 			};
 		case CartActionTypes.FETCH_USER_CART_FAILURE:
 			return {

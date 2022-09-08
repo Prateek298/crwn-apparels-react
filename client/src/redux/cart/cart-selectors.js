@@ -4,6 +4,10 @@ const selectCart = state => state.cart;
 
 export const selectCartItems = createSelector([ selectCart ], cart => cart.cartItems);
 
+export const selectPastOrders = createSelector([ selectCart ], cart => cart.pastOrders);
+
+export const selectTotalPurchase = createSelector([ selectCart ], cart => cart.totalPurchase);
+
 export const selectCartHidden = createSelector([ selectCart ], cart => cart.hidden);
 
 export const selectCartItemsCount = createSelector([ selectCartItems ], cartItems =>

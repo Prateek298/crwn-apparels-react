@@ -1,0 +1,56 @@
+.orders-page {
+	width: 55%;
+	min-height: 90vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 50px auto 25px;
+
+	@media screen and (max-width: 800px) {
+		width: 90%;
+	}
+
+	.orders-header {
+		width: 100%;
+		padding: 10px 0;
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 1px solid darkgrey;
+
+		.header-block {
+			text-transform: capitalize;
+			width: 23%;
+
+			&:last-child {
+				width: 8%;
+			}
+
+			@media screen and (max-width: 800px) {
+				width: 22%;
+
+				&:last-child {
+					width: 12%;
+				}
+			}
+
+			@media screen and (max-width: 400px) {
+				width: 21%;
+
+				&:nth-of-type(3) {
+					width: 22%;
+					padding-left: 5px;
+				}
+
+				&:last-child {
+					width: 14%;
+				}
+			}
+		}
+	}
+
+	.total {
+		margin-top: 30px;
+		margin-left: auto;
+		font-size: 36px;
+	}
+}

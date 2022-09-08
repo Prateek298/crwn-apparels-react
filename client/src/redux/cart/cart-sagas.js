@@ -44,7 +44,7 @@ function* fetchUserCartAsync() {
 		// create cart for a new user
 		if (userCartSnap.empty) {
 			yield call(addCollectionAndDocuments, 'carts', [
-				{ cartItems: [], totalPurchase: 0, userId: currentUser.id }
+				{ cartItems: [], pastOrders: [], totalPurchase: 0, userId: currentUser.id }
 			]);
 			optionalGetCartRuns++;
 		}
@@ -59,9 +59,9 @@ function* fetchUserCartAsync() {
 
 		userCartSnap = optionalGetCartRuns ? yield call(getUserCartSnapshot, currentUser.id) : userCartSnap;
 
-		const { cartItems: userCart } = userCartSnap.docs[0].data();
+		const { cartItems, pastOrders, totalPurchase } = userCartSnap.docs[0].data();
 
-		yield put(fetchUserCartSuccess(userCart));
+		yield put(fetchUserCartSuccess({ cartItems, pastOrders, totalPurchase }));
 	} catch (err) {
 		yield put(fetchUserCartFailure(err));
 	}
@@ -115,29 +115,40 @@ function* clearItemFromBothCarts({ payload: item }) {
 // After a successful payment made by the logged-in user
 
 function* onPaymentSuccess() {
-	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, modifyCartsAfterPayment);
+	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, afterPaymentSuccess);
 }
 
-function* modifyCartsAfterPayment() {
+function* afterPaymentSuccess() {
 	try {
 		const currentUser = yield select(selectCurrentUser);
+
+		const userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
+		const userCart = userCartSnap.docs[0];
+
+		yield call(modifyCartsAfterPayment, userCart);
+		yield call(fetchUserCartAsync);
+	} catch (err) {
+		console.error('After payment success error', err.message);
+	}
+}
+
+function* modifyCartsAfterPayment(userCart) {
+	try {
 		const total = yield select(selectCartTotal);
 
 		//clearing redux cart
 		yield call(clearReduxCart);
 
-		const userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
-		const userCart = userCartSnap.docs[0];
-		const totalPurchase = userCart.data().totalPurchase + total;
-
 		// clearing cartItems in firestore and updating total amount spent by the user
+		const userCartData = userCart.data();
 		yield firestore.doc(`carts/${userCart.id}`).set({
-			...userCart.data(),
-			totalPurchase,
+			...userCartData,
+			totalPurchase: userCartData.totalPurchase + total,
+			pastOrders: [ ...userCartData.cartItems, ...userCartData.pastOrders ],
 			cartItems: []
 		});
 	} catch (err) {
-		console.error('Error while clearing user cart(s) ', err.message);
+		console.error('Error while modifying user cart(s) ', err.message);
 	}
 }
 
