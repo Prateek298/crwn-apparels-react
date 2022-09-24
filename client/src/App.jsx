@@ -4,19 +4,19 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import './App.css';
 
-import { checkUserSession } from './redux/user/user-actions';
-import { selectCurrentUser } from './redux/user/user-selectors';
+import { checkUserSession } from 'redux/user/user-actions';
+import { selectCurrentUser } from 'redux/user/user-selectors';
 
-import Header from './components/header/header-comp';
-import LoadingSpinner from './components/loadingSpinner/loadingSpinner-comp';
-import ErrorBoundary from './components/errorBoundary/errorBoundary-comp';
+import Header from 'components/Header';
+import LoadingSpinner from 'components/LoadingSpinner';
+import ErrorBoundary from 'components/ErrorBoundary';
 
-const HomePage = lazy(() => import('./pages/homepage/homepage-comp'));
-const ShopPage = lazy(() => import('./pages/shop/shop-comp'));
-const AuthPage = lazy(() => import('./pages/authPage/authPage-comp'));
-const CheckoutPage = lazy(() => import('./pages/checkoutPage/checkoutPage-comp'));
-const AdminPage = lazy(() => import('./pages/adminPage/adminPage-comp'));
-const OrdersPage = lazy(() => import('./pages/ordersPage/ordersPage-comp'));
+const HomePage = lazy(() => import('pages/home'));
+const ShopPage = lazy(() => import('pages/shop'));
+const AuthPage = lazy(() => import('pages/auth'));
+const CheckoutPage = lazy(() => import('pages/checkout'));
+const AdminPage = lazy(() => import('pages/admin'));
+const OrdersPage = lazy(() => import('pages/orders'));
 
 require('dotenv').config();
 
