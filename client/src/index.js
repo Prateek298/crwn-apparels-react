@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 
@@ -12,8 +12,12 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { store, persistor } from './redux/store';
 
-ReactDOM.render(
-	<React.StrictMode>
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+// Strict mode causes ui to render the 2nd time even after the state is updated in react 18
+root.render(
+	// <React.StrictMode>
 		<Provider store={store}>
 			<BrowserRouter>
 				<PersistGate persistor={persistor}>
@@ -21,8 +25,7 @@ ReactDOM.render(
 				</PersistGate>
 			</BrowserRouter>
 		</Provider>
-	</React.StrictMode>,
-	document.getElementById('root')
+	// </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

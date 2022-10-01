@@ -1,6 +1,6 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './App.css';
 
@@ -22,6 +22,9 @@ require('dotenv').config();
 
 const App = () => {
 	const dispatch = useDispatch();
+	const currentUser = useSelector(state => state.user.currentUser);
+
+	console.log(currentUser);
 
 	useEffect(
 		() => {
