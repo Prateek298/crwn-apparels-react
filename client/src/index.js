@@ -10,7 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { store, persistor } from './redux/store';
+import configureAppStore, { persistor } from './redux/store';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -18,7 +18,7 @@ const root = createRoot(container);
 // Strict mode causes ui to render the 2nd time even after the state is updated in react 18
 root.render(
 	// <React.StrictMode>
-		<Provider store={store}>
+		<Provider store={configureAppStore()}>
 			<BrowserRouter>
 				<PersistGate persistor={persistor}>
 					<App />
