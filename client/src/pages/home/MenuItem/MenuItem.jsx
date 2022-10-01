@@ -1,14 +1,13 @@
 import React from 'react';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import './MenuItem.scss';
 
 const MenuItem = ({ title, imageUrl, size, linkUrl }) => {
-	const history = useHistory();
-	const match = useRouteMatch();
+	const navigate = useNavigate();
 
 	return (
-		<div className={`${size} menu-item`} onClick={() => history.push(`${match.url}${linkUrl}`)}>
+		<div className={`${size} menu-item`} onClick={() => navigate(linkUrl)}>
 			{/* div for changing background image on different MenuItems */}
 			<div className="bg-img" style={{ backgroundImage: `url(${imageUrl})` }} />
 
