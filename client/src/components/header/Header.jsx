@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import './Header.scss';
@@ -20,39 +20,42 @@ const Header = () => {
 	const dispatch = useDispatch();
 
 	return (
-		<div className="header">
-			{/* Link is 'a' tag that doesnt redirects to a different page, but to the simulated url by react-router-dom */}
-			<Link className="logo-container" to="/">
-				<Logo className="logo" />
-			</Link>
-			<div className="options">
-				{/* The isAdmin property is added directly to the user's firestore doc through console or code. Firebase does provide an admin SDK, but for the sake of simplicity and extra overhead for a simple feature, I avoided it. */}
-				{currentUser?.isAdmin ? (
-					<Link className="option" to="/admin">
-						ADMIN
-					</Link>
-				) : 
-					console.log()
-				}
-				<Link className="option" to="/shop">
-					SHOP
+		<>
+			<div className="header">
+				{/* Link is 'a' tag that doesnt redirects to a different page, but to the simulated url by react-router-dom */}
+				<Link className="logo-container" to="/">
+					<Logo className="logo" />
 				</Link>
-				<Link className="option" to="/orders">
-					ORDERS
-				</Link>
-				{currentUser ? (
-					<div className="option" onClick={() => dispatch(signOutStart())}>
-						SIGN OUT
-					</div>
-				) : (
-					<Link className="option" to="/sign">
-						SIGN IN
+				<div className="options">
+					{/* The isAdmin property is added directly to the user's firestore doc through console or code. Firebase does provide an admin SDK, but for the sake of simplicity and extra overhead for a simple feature, I avoided it. */}
+					{currentUser?.isAdmin ? (
+						<Link className="option" to="/admin">
+							ADMIN
+						</Link>
+					) : 
+						console.log()
+					}
+					<Link className="option" to="/shop">
+						SHOP
 					</Link>
-				)}
-				<CartIcon />
+					<Link className="option" to="/orders">
+						ORDERS
+					</Link>
+					{currentUser ? (
+						<div className="option" onClick={() => dispatch(signOutStart())}>
+							SIGN OUT
+						</div>
+					) : (
+						<Link className="option" to="/sign">
+							SIGN IN
+						</Link>
+					)}
+					<CartIcon />
+				</div>
+				{hidden ? null : <CartDropDown />}
 			</div>
-			{hidden ? null : <CartDropDown />}
-		</div>
+			<Outlet />
+		</>
 	);
 };
 

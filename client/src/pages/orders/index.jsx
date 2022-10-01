@@ -1,15 +1,20 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 import './page.scss';
 
 import CheckoutItem from 'components/CheckoutItem';
 
+import { selectCurrentUser } from 'redux/user/user-selectors'
 import { selectPastOrders, selectTotalPurchase } from 'redux/cart/cart-selectors';
 
 const OrdersPage = () => {
+	const currentUser = useSelector(selectCurrentUser);
 	const pastOrders = useSelector(selectPastOrders);
 	const totalPurchase = useSelector(selectTotalPurchase);
+
+	if (!currentUser) return <Navigate to="/" />;
 
 	return pastOrders.length ? (
 		<div className="orders-page">
