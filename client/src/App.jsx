@@ -22,7 +22,7 @@ require('dotenv').config();
 
 const App = () => {
 	const dispatch = useDispatch();
-	
+
 	useEffect(
 		() => {
 			dispatch(checkUserSession());

@@ -1,49 +1,19 @@
-import CartActionTypes from './cart-actions-types';
+import { createAction } from '@reduxjs/toolkit';
 
-export const toggleCartHidden = () => ({
-	type: CartActionTypes.TOGGLE_CART_HIDDEN
-});
+import { cartActions } from './cart-slice';
 
-export const addItem = item => ({
-	type: CartActionTypes.ADD_ITEM,
-	payload: item
-});
+export const fetchUserCart = createAction('FETCH_USER_CART');
+export const addItem = createAction('ADD_ITEM');
+export const removeItem = createAction('REMOVE_ITEM');
+export const clearItem = createAction('CLEAR_ITEM');
 
-export const reduxCartAddItem = item => ({
-	type: CartActionTypes.REDUX_CART_ADD_ITEM,
-	payload: item
-});
-
-export const removeItem = item => ({
-	type: CartActionTypes.REMOVE_ITEM,
-	payload: item
-});
-
-export const reduxCartRemoveItem = item => ({
-	type: CartActionTypes.REDUX_CART_REMOVE_ITEM,
-	payload: item
-});
-
-export const clearItem = item => ({
-	type: CartActionTypes.CLEAR_ITEM,
-	payload: item
-});
-
-export const reduxCartClearItem = item => ({
-	type: CartActionTypes.REDUX_CART_CLEAR_ITEM,
-	payload: item
-});
-
-export const reduxClearCart = () => ({
-	type: CartActionTypes.REDUX_CLEAR_CART
-});
-
-export const fetchUserCartSuccess = userCart => ({
-	type: CartActionTypes.FETCH_USER_CART_SUCCESS,
-	payload: userCart
-});
-
-export const fetchUserCartFailure = err => ({
-	type: CartActionTypes.FETCH_USER_CART_FAILURE,
-	payload: err
-});
+export const {
+	toggleCartHidden,
+	setCartLoading,
+	reduxCartAddItem,
+	reduxCartRemoveItem,
+	reduxCartClearItem,
+	reduxClearCart,
+	setUserCart,
+	setError,
+} = cartActions;
