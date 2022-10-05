@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import './CollectionOverview.scss';
 
 import { selectIsCollectionFetching, selectCollectionsForPreview } from 'redux/shop/shop-selectors';
-import { fetchCollectionsStart } from 'redux/shop/shop-actions';
+import { fetchCollections } from 'redux/shop/shop-actions';
 
 import CollectionPreview from './CollectionPreview';
 import LoadingSpinner from 'components/LoadingSpinner';
@@ -17,7 +17,7 @@ const CollectionOverview = () => {
 
 	useEffect(
 		() => {
-			dispatch(fetchCollectionsStart());
+			dispatch(fetchCollections());
 		},
 		[ dispatch ]
 	);

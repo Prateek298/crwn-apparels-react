@@ -4,21 +4,21 @@ import { useParams } from 'react-router-dom';
 
 import './page.scss';
 
-import { selectCollection, selectIsCollectionLoaded } from 'redux/shop/shop-selectors';
-import { fetchCollectionsStart } from 'redux/shop/shop-actions';
+import { selectCollection, selectIsCollectionFetching } from 'redux/shop/shop-selectors';
+import { fetchCollections } from 'redux/shop/shop-actions';
 
 import CollectionItem from 'components/CollectionItem';
 import LoadingSpinner from 'components/LoadingSpinner';
 
 const CollectionPage = () => {
 	const { collectionId } = useParams();
-	const isLoading = !useSelector(selectIsCollectionLoaded);
+	const isLoading = useSelector(selectIsCollectionFetching);
 	const collection = useSelector(selectCollection(collectionId));
 
 	const dispatch = useDispatch();
 	
 	useEffect(() => {
-			dispatch(fetchCollectionsStart());
+			dispatch(fetchCollections());
 		}, [ dispatch ]
 	);
 

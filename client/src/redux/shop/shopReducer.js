@@ -1,33 +1,27 @@
-import ShopActionTypes from './shop-action-types';
+import { createSlice } from '@reduxjs/toolkit';
 
 const INITIAL_STATE = {
 	collections: null,
 	isFetching: false,
-	errorMessage: ''
+	error: null,
 };
 
-const shopReducer = (state = INITIAL_STATE, action) => {
-	switch (action.type) {
-		case ShopActionTypes.FETCH_COLLECTIONS_START:
-			return {
-				...state,
-				isFetching: true
-			};
-		case ShopActionTypes.FETCH_COLLECTIONS_SUCCESS:
-			return {
-				...state,
-				isFetching: false,
-				collections: action.payload
-			};
-		case ShopActionTypes.FETCH_COLLECTIONS_FAILURE:
-			return {
-				...state,
-				isFetching: false,
-				errorMessage: action.payload
-			};
-		default:
-			return state;
-	}
-};
+const shopSlice = createSlice({
+	name: 'shop',
+	initialState: INITIAL_STATE,
+	reducers: {
+		isCollectionsFetching: (state, { payload }) => {
+			state.isFetching = payload;
+		},
+		setCollections: (state, { payload }) => {
+			state.collections = payload;
+		},
+		setError: (state, { payload }) => {
+			state.error = payload;
+		},
+	},
+});
 
-export default shopReducer;
+export const shopActions = shopSlice.actions;
+
+export default shopSlice.reducer;
