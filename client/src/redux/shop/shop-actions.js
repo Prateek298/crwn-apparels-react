@@ -1,15 +1,7 @@
-import ShopActionTypes from './shop-action-types';
+import { createAction } from '@reduxjs/toolkit';
 
-export const fetchCollectionsStart = () => ({
-	type: ShopActionTypes.FETCH_COLLECTIONS_START
-});
+import { shopActions } from './shopReducer';
 
-export const fetchCollectionsSuccess = collectionsMap => ({
-	type: ShopActionTypes.FETCH_COLLECTIONS_SUCCESS,
-	payload: collectionsMap
-});
+export const fetchCollections = createAction('FETCH_COLLECTIONS');
 
-export const fetchCollectionsFailure = errorMessage => ({
-	type: ShopActionTypes.FETCH_COLLECTIONS_FAILURE,
-	payload: errorMessage
-});
+export const { isCollectionsFetching, setCollections, setError } = shopActions;
