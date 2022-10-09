@@ -6,7 +6,7 @@ import './Header.scss';
 
 import { selectCurrentUser } from 'redux/user/user-selectors';
 import { selectCartHidden } from 'redux/cart/cart-selectors';
-import { signOutStart } from 'redux/user/user-actions';
+import { signOut } from 'redux/user/user-actions';
 
 import { ReactComponent as Logo } from 'assets/crown.svg';
 import CartIcon from '../CartIcon';
@@ -42,7 +42,7 @@ const Header = () => {
 						ORDERS
 					</Link>
 					{currentUser ? (
-						<div className="option" onClick={() => dispatch(signOutStart())}>
+						<div className="option" onClick={() => dispatch(signOut())}>
 							SIGN OUT
 						</div>
 					) : (

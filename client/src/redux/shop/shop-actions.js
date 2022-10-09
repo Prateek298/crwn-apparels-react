@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 
-import { shopActions } from './shopReducer';
+import { shopActions } from './shop-slice';
 
 export const fetchCollections = createAction('FETCH_COLLECTIONS');
 

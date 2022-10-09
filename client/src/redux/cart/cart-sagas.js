@@ -5,9 +5,9 @@ import {
 	addItem,
 	removeItem,
 	clearItem,
+	reduxClearCart,
 	setCartLoading,
 	setUserCart,
-	reduxClearCart,
 	reduxCartAddItem,
 	reduxCartRemoveItem,
 	reduxCartClearItem,
@@ -15,32 +15,17 @@ import {
 } from './cart-actions';
 
 import { firestore, addCollectionAndDocuments } from '../../firebaseConfig';
-import {
-	addItemToCart,
-	removeItemFromCart,
-	clearItemFromCart,
-} from './cart-utils';
+import { addItemToCart, removeItemFromCart, clearItemFromCart } from './cart-utils';
 import { selectCurrentUser } from '../user/user-selectors';
 import { selectCartItems, selectCartTotal } from './cart-selectors';
-
-import UserActionTypes from '../user/user-action-types';
+import { paymentSuccess, signInSuccess } from 'redux/user/user-actions';
 
 const unexpectedErrorMsg = 'Something went wrong';
-
-// clears frontend user cart when user signs out
-
-function* onSignOutSuccess() {
-	yield takeLatest(UserActionTypes.SIGN_OUT_SUCCESS, clearReduxCart);
-}
-
-function* clearReduxCart() {
-	yield put(reduxClearCart());
-}
 
 // fetch user's cart from firestore on login
 
 function* fetchUserCartStart() {
-	yield takeLatest(UserActionTypes.SIGN_IN_SUCCESS, fetchUserCartAsync);
+	yield takeLatest(signInSuccess, fetchUserCartAsync);
 	yield takeLatest(fetchUserCart, fetchUserCartAsync);
 }
 
@@ -51,9 +36,7 @@ function* fetchUserCartAsync() {
 		const currentUser = yield select(selectCurrentUser);
 
 		// if a user is logged-in, following doesn't exist
-		const cartItemsBeforeSignIn = !currentUser
-			? yield select(selectCartItems)
-			: null;
+		const cartItemsBeforeSignIn = !currentUser ? yield select(selectCartItems) : null;
 
 		// get the firestore cart of the logged-in user
 		let userCartSnap = yield call(getUserCartSnapshot, currentUser.id);
@@ -85,8 +68,7 @@ function* fetchUserCartAsync() {
 			? yield call(getUserCartSnapshot, currentUser.id)
 			: userCartSnap;
 
-		const { cartItems, pastOrders, totalPurchase } =
-			userCartSnap.docs[0].data();
+		const { cartItems, pastOrders, totalPurchase } = userCartSnap.docs[0].data();
 
 		yield put(setUserCart({ cartItems, pastOrders, totalPurchase }));
 	} catch (err) {
@@ -105,12 +87,7 @@ function* onAddItem() {
 
 function* addItemToBothCarts({ payload: item }) {
 	try {
-		const error = yield call(
-			alterCarts,
-			item,
-			addItemToCart,
-			reduxCartAddItem
-		);
+		const error = yield call(alterCarts, item, addItemToCart, reduxCartAddItem);
 
 		if (!error) {
 			yield put(fetchUserCart());
@@ -131,12 +108,7 @@ function* onRemoveItem() {
 
 function* removeItemFromBothCarts({ payload: item }) {
 	try {
-		const error = yield call(
-			alterCarts,
-			item,
-			removeItemFromCart,
-			reduxCartRemoveItem
-		);
+		const error = yield call(alterCarts, item, removeItemFromCart, reduxCartRemoveItem);
 
 		if (!error) {
 			yield put(fetchUserCart());
@@ -157,20 +129,12 @@ function* onClearItem() {
 
 function* clearItemFromBothCarts({ payload: item }) {
 	try {
-		const error = yield call(
-			alterCarts,
-			item,
-			clearItemFromCart,
-			reduxCartClearItem
-		);
+		const error = yield call(alterCarts, item, clearItemFromCart, reduxCartClearItem);
 
 		if (!error) {
 			yield put(fetchUserCart());
 		} else {
-			console.error(
-				'Error while clearing an item from cart',
-				error.message
-			);
+			console.error('Error while clearing an item from cart', error.message);
 			yield put(setError(error));
 		}
 	} catch (err) {
@@ -181,7 +145,7 @@ function* clearItemFromBothCarts({ payload: item }) {
 // After a successful payment made by the logged-in user
 
 function* onPaymentSuccess() {
-	yield takeLatest(UserActionTypes.PAYMENT_SUCCESS, afterPaymentSuccess);
+	yield takeLatest(paymentSuccess, afterPaymentSuccess);
 }
 
 function* afterPaymentSuccess() {
@@ -203,7 +167,7 @@ function* modifyCartsAfterPayment(userCart) {
 		const total = yield select(selectCartTotal);
 
 		//clearing redux cart
-		yield call(clearReduxCart);
+		yield put(reduxClearCart());
 
 		// clearing cartItems in firestore and updating total amount spent by the user
 		const userCartData = userCart.data();
@@ -261,15 +225,11 @@ function* modifyFirebaseCart(item, modFunc) {
 }
 
 function* getUserCartSnapshot(userId) {
-	return yield firestore
-		.collection('carts')
-		.where('userId', '==', userId)
-		.get();
+	return yield firestore.collection('carts').where('userId', '==', userId).get();
 }
 
 export function* cartSagas() {
 	yield all([
-		call(onSignOutSuccess),
 		call(fetchUserCartStart),
 		call(onAddItem),
 		call(onRemoveItem),

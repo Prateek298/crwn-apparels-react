@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { emailSignUpStart } from 'redux/user/user-actions';
+import { emailSignUp } from 'redux/user/user-actions';
 
 import './SignUp.scss';
 
@@ -28,7 +28,7 @@ const SignUp = () => {
 			return;
 		}
 
-		dispatch(emailSignUpStart({ email, password, displayName }));
+		dispatch(emailSignUp({ email, password, displayName }));
 	};
 
 	const handleChange = e => {

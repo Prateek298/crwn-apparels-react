@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import './SignIn.scss';
 
-import { googleSignInStart, emailSignInStart } from 'redux/user/user-actions';
+import { googleSignIn, emailSignIn } from 'redux/user/user-actions';
 
 import FormInput from 'components/FormInput';
 import CustomButton from 'components/CustomButton';
@@ -17,7 +17,7 @@ const SignIn = () => {
 	const handleSubmit = async e => {
 		e.preventDefault();
 
-		dispatch(emailSignInStart({ email, password }));
+		dispatch(emailSignIn({ email, password }));
 	};
 
 	const handleChange = e => {
@@ -42,7 +42,7 @@ const SignIn = () => {
 				/>
 				<div className="buttons">
 					<CustomButton type="submit">SIGN IN</CustomButton>
-					<CustomButton type="button" onClick={() => dispatch(googleSignInStart())} isGoogleSignIn>
+					<CustomButton type="button" onClick={() => dispatch(googleSignIn())} isGoogleSignIn>
 						SIGN IN WITH GOOGLE
 					</CustomButton>
 				</div>
