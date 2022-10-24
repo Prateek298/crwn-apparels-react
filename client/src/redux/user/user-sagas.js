@@ -1,97 +1,112 @@
 import { takeLatest, call, put, all } from 'redux-saga/effects';
 
-import { auth, googleProvider, createUserProfileDocument, getCurrentUser } from '../../firebaseConfig';
-
-import UserActionTypes from './user-action-types';
 import {
+	auth,
+	googleProvider,
+	createUserProfileDocument,
+	getCurrentUser,
+} from '../../firebaseConfig';
+
+import {
+	emailSignUp,
+	googleSignIn,
+	emailSignIn,
 	signInSuccess,
-	signInFailure,
-	signOutSuccess,
-	signOutFailure,
-	paymentFailure,
-	paymentSuccess
+	signOut,
+	checkUserSession,
+	doPayment,
+	paymentSuccess,
+	setCurrentUser,
+	setError,
 } from './user-actions';
 import { reduxClearCart } from '../cart/cart-actions';
 
 import axios from 'axios';
 
+const unexpectedErrorMsg = 'Some error occured';
+
 // When new user signs up with email
 
-// 2nd argument receives the action from respective reducer
-function* onEmailSignUpStart() {
-	yield takeLatest(UserActionTypes.EMAIL_SIGN_UP_START, createNewUser);
+function* onEmailSignUp() {
+	yield takeLatest(emailSignUp, createNewUser);
 }
 
 function* createNewUser({ payload: { email, password, displayName } }) {
 	try {
 		const { user } = yield auth.createUserWithEmailAndPassword(email, password);
 		yield call(createUserProfileDocument, user, { displayName });
-		yield getSnapshotFromUserAuth(user);
+		yield call(getSnapshotFromUserAuth, user);
 	} catch (err) {
-		yield put(signInFailure(err));
+		console.log('Error while creating new user \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 // when user signs in with google
 
-function* onGoogleSignInStart() {
-	yield takeLatest(UserActionTypes.GOOGLE_SIGN_IN_START, signInWithGoogle);
+function* onGoogleSignIn() {
+	yield takeLatest(googleSignIn, signInWithGoogle);
 }
 
 function* signInWithGoogle() {
 	try {
 		const { user } = yield auth.signInWithPopup(googleProvider);
-		yield getSnapshotFromUserAuth(user);
+		yield call(getSnapshotFromUserAuth, user);
 	} catch (err) {
-		yield put(signInFailure(err));
+		console.log('Error signing in with google \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 // when user signs in with email
 
-function* onEmailSignInStart() {
-	yield takeLatest(UserActionTypes.EMAIL_SIGN_IN_START, signInWithEmail);
+function* onEmailSignIn() {
+	yield takeLatest(emailSignIn, signInWithEmail);
 }
 
 function* signInWithEmail({ payload: { email, password } }) {
 	try {
 		const { user } = yield auth.signInWithEmailAndPassword(email, password);
-		yield getSnapshotFromUserAuth(user);
+		yield call(getSnapshotFromUserAuth, user);
 	} catch (err) {
-		yield put(signInFailure(err));
+		console.log('Error signing in with email \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 // to check for existing user when session restarts
 
 function* onCheckUserSession() {
-	yield takeLatest(UserActionTypes.CHECK_USER_SESSION, isUserAuthenticated);
+	yield takeLatest(checkUserSession, isUserAuthenticated);
 }
 
 function* isUserAuthenticated() {
 	try {
-		const userAuth = yield getCurrentUser();
+		const userAuth = yield call(getCurrentUser);
 		if (!userAuth) return;
 		yield put(reduxClearCart());
-		yield getSnapshotFromUserAuth(userAuth);
+		yield call(getSnapshotFromUserAuth, userAuth);
 	} catch (err) {
-		yield put(signInFailure(err));
+		console.log('Error checking user session \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 // when user signs out
 
-function* onSignOutStart() {
-	yield takeLatest(UserActionTypes.SIGN_OUT_START, signOut);
+function* onSignOut() {
+	yield takeLatest(signOut, signOutUser);
 }
 
-function* signOut() {
+function* signOutUser() {
 	try {
 		// sign out from firebase
 		yield auth.signOut();
-		yield put(signOutSuccess());
+		yield put(reduxClearCart());
+		yield put(setCurrentUser(null));
 	} catch (err) {
-		yield put(signOutFailure(err));
+		console.log('Error while user signout \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
@@ -101,16 +116,18 @@ function* getSnapshotFromUserAuth(userAuth) {
 	try {
 		const userRef = yield call(createUserProfileDocument, userAuth);
 		const userSnapshot = yield userRef.get();
-		yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
+		yield put(setCurrentUser({ id: userSnapshot.id, ...userSnapshot.data() }));
+		yield put(signInSuccess());
 	} catch (err) {
-		yield signInFailure(err);
+		console.log('Error getting user snapshot \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 // When user makes a payment
 
-function* onPaymentStart() {
-	yield takeLatest(UserActionTypes.PAYMENT_START, sendPaymentRequest);
+function* onPayment() {
+	yield takeLatest(doPayment, sendPaymentRequest);
 }
 
 function* sendPaymentRequest({ payload: { token, priceForStripe } }) {
@@ -120,25 +137,25 @@ function* sendPaymentRequest({ payload: { token, priceForStripe } }) {
 			method: 'post',
 			data: {
 				amount: priceForStripe,
-				token
-			}
+				token,
+			},
 		});
 		yield put(paymentSuccess());
 		alert('Payment Successful');
 	} catch (err) {
-		console.log('Payment error: ', err);
-		yield put(paymentFailure(err));
+		console.log('Payment error: \n', err);
+		yield put(setError(unexpectedErrorMsg));
 	}
 }
 
 export function* userSagas() {
 	yield all([
-		call(onEmailSignUpStart),
-		call(onGoogleSignInStart),
-		call(onEmailSignInStart),
+		call(onEmailSignUp),
+		call(onGoogleSignIn),
+		call(onEmailSignIn),
 		call(onCheckUserSession),
-		call(onSignOutStart),
-		call(onPaymentStart)
+		call(onSignOut),
+		call(onPayment),
 	]);
 }
 
